@@ -85,7 +85,7 @@ export default function PremiumPage() {
                   ))}
                 </div>
 
-                <PayPalScriptProvider options={{ "client-id": "EGAyMioXpt3UZTBi5yzXpg0txQZfYl2unGBuCU37MFEeicKMXEgHUsE2e7IRknp-TDAGmYgM0EqatpOF", currency: "USD" }}>
+                <PayPalScriptProvider options={{ "client-id": "EJURH8pFVawDFECb63FPfrt7iCz4cnIH07t3y7Suh_impTl_OElONCpvytosT8Uw1awwpgm5jAsi6jw6", currency: "USD" }}>
                   <PayPalButtons
                     style={{ layout: "vertical", color: "gold", shape: "rect", label: "pay" }}
                     createOrder={(data, actions) => {
