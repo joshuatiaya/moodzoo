@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js"
 import { Crown, Check } from "lucide-react"
