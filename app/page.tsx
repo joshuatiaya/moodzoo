@@ -5,6 +5,7 @@ import { InsightsPreview } from "@/components/insights-preview"
 import { QuickActions } from "@/components/quick-actions"
 import { EvolutionPreview } from "@/components/evolution-preview"
 import { PremiumSystem } from "@/components/premium-system"
+import { QuestSystem } from "@/components/quest-system"
 
 export default function HomePage() {
   return (
@@ -21,6 +22,7 @@ export default function HomePage() {
 
           <MoodLogger />
           <PremiumSystem />
+          <QuestSystem />
           <EvolutionPreview />
           <ZooPreview />
           <InsightsPreview />

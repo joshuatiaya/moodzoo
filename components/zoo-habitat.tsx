@@ -138,6 +138,71 @@ const EVOLVED_ANIMALS = {
   },
 }
 
+const SKIN_COLORS = {
+  "first-mood": "bg-yellow-200",
+  "mood-streak-3": "bg-green-200",
+  "mood-streak-7": "bg-blue-200",
+  "breathing-5": "bg-gray-200",
+  "coloring-3": "bg-pink-200",
+  "game-5": "bg-cyan-200",
+  "all-moods": "bg-purple-200",
+  evolution: "bg-orange-200",
+  "premium-user": "bg-yellow-500",
+  "legendary-egg": "bg-star-200",
+  "collection-10": "bg-trophy-200",
+  "perfect-week": "bg-star-200",
+}
+
+const getSkinForQuest = (questId: string, index: number): string => {
+  const skinMap: Record<string, string> = {
+    "first-mood": "bg-yellow-200",
+    "mood-streak-3": "bg-green-200",
+    "mood-streak-7": "bg-blue-200",
+    "breathing-5": "bg-gray-200",
+    "coloring-3": "bg-pink-200",
+    "game-5": "bg-cyan-200",
+    "all-moods": "bg-purple-200",
+    evolution: "bg-orange-200",
+    "premium-user": "bg-yellow-500",
+    "legendary-egg": "bg-star-200",
+    "collection-10": "bg-trophy-200",
+    "perfect-week": "bg-star-200",
+  }
+  return skinMap[questId] || "bg-gray-500"
+}
+
+const renderAnimalWithSkin = (emoji: string, skinColor: string | undefined) => {
+  if (!skinColor) return emoji
+
+  // Extract the color value from the Tailwind class
+  const colorMap: Record<string, string> = {
+    "bg-blue-500": "#3b82f6",
+    "bg-yellow-500": "#eab308",
+    "bg-purple-500": "#a855f7",
+    "bg-green-500": "#22c55e",
+    "bg-pink-500": "#ec4899",
+    "bg-orange-500": "#f97316",
+    "bg-indigo-500": "#6366f1",
+    "bg-amber-500": "#f59e0b",
+    "bg-rose-500": "#f43f5e",
+    "bg-teal-500": "#14b8a6",
+    "bg-cyan-500": "#06b6d4",
+  }
+
+  const hexColor = colorMap[skinColor] || "#000000"
+
+  return (
+    <span
+      style={{
+        filter: `drop-shadow(0 0 8px ${hexColor}) brightness(1.2) saturate(1.3)`,
+        display: "inline-block",
+      }}
+    >
+      {emoji}
+    </span>
+  )
+}
+
 export function ZooHabitat() {
   const [selectedHabitat, setSelectedHabitat] = useState<string | null>(null)
   const [selectedAnimal, setSelectedAnimal] = useState<any>(null)
@@ -145,13 +210,19 @@ export function ZooHabitat() {
   const [showExplanations, setShowExplanations] = useState(false)
   const [evolutions, setEvolutions] = useState<any>({})
   const [refreshKey, setRefreshKey] = useState(0)
+  const [completedQuests, setCompletedQuests] = useState<string[]>([])
+  const [animalSkins, setAnimalSkins] = useState<Record<string, string>>({})
   const isPremium = usePremiumStatus()
 
   useEffect(() => {
     const entries = JSON.parse(localStorage.getItem("moodEntries") || "[]")
     const savedEvolutions = JSON.parse(localStorage.getItem("animalEvolutions") || "{}")
+    const savedQuests = JSON.parse(localStorage.getItem("completedQuests") || "[]")
+    const savedSkins = JSON.parse(localStorage.getItem("animalSkins") || "{}")
     setMoodEntries(entries)
     setEvolutions(savedEvolutions)
+    setCompletedQuests(savedQuests)
+    setAnimalSkins(savedSkins)
   }, [refreshKey])
 
   const getAnimalsForHabitat = (habitat: any) => {
@@ -194,6 +265,8 @@ export function ZooHabitat() {
               else if (diffDays > 1) lastSeen = `${diffDays} days ago`
             }
 
+            const primarySkinColor = completedQuests.length > 0 ? getSkinForQuest(completedQuests[0]) : undefined
+
             animals.push({
               emoji: animalData.emoji,
               mood: animalData.name,
@@ -201,6 +274,7 @@ export function ZooHabitat() {
               lastSeen,
               tier,
               originalMood: mood.label,
+              skins: [primarySkinColor],
             })
           }
         }
@@ -266,7 +340,9 @@ export function ZooHabitat() {
         </div>
 
         <Card className="p-8 text-center space-y-6">
-          <div className="text-8xl">{selectedAnimal.emoji}</div>
+          <div className="text-8xl relative inline-block">
+            {renderAnimalWithSkin(selectedAnimal.emoji, selectedAnimal.skins?.[0])}
+          </div>
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-foreground">{selectedAnimal.mood} Animal</h2>
             <Badge variant="secondary">Population: {selectedAnimal.count}</Badge>
@@ -314,7 +390,7 @@ export function ZooHabitat() {
                 return (
                   <div className="space-y-3 max-h-60 overflow-y-auto">
                     {explanations.map((entry, index) => (
-                      <div key={entry.id} className="p-3 bg-muted rounded-lg space-y-2">
+                      <div key={index} className="p-3 bg-muted rounded-lg space-y-2">
                         <p className="text-sm italic">"{entry.explanation}"</p>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Calendar className="h-3 w-3" />
@@ -374,7 +450,9 @@ export function ZooHabitat() {
                       onClick={() => handleAnimalClick(animal)}
                       className="bg-black/20 rounded-lg p-4 flex items-center gap-4 hover:bg-black/30 transition-colors"
                     >
-                      <div className="text-4xl">{animal.emoji}</div>
+                      <div className="text-4xl relative inline-block">
+                        {renderAnimalWithSkin(animal.emoji, animal.skins?.[0])}
+                      </div>
                       <div className="flex-1 text-left">
                         <div className="text-white font-medium">{animal.mood}</div>
                         <div className="text-white/70 text-sm">Population: {animal.count}</div>
@@ -527,8 +605,8 @@ export function ZooHabitat() {
                     ) : (
                       <div className="flex items-center gap-2">
                         {habitatAnimals.slice(0, 4).map((animal, index) => (
-                          <div key={index} className="text-2xl">
-                            {animal.emoji}
+                          <div key={index} className="text-2xl relative inline-block">
+                            {renderAnimalWithSkin(animal.emoji, animal.skins?.[0])}
                           </div>
                         ))}
                         {habitatAnimals.length > 4 && (

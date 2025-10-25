@@ -23,6 +23,13 @@ export function QuickActions() {
           </Button>
         </Link>
 
+        <Link href="/eggs">
+          <Button variant="outline" className="w-full h-16 flex-col gap-2 bg-transparent">
+            <div className="text-lg">🥚</div>
+            <span className="text-sm">Eggs</span>
+          </Button>
+        </Link>
+
         <Link href="/zoo">
           <Button variant="outline" className="w-full h-16 flex-col gap-2 bg-transparent">
             <div className="text-lg">🦁</div>

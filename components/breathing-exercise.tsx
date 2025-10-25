@@ -16,6 +16,7 @@ export function BreathingExercise({ onBack }: BreathingExerciseProps) {
   const [timeLeft, setTimeLeft] = useState(4)
   const [cycle, setCycle] = useState(0)
   const [totalCycles] = useState(6)
+  const [currentMood, setCurrentMood] = useState<string | null>(null)
 
   const phaseConfig = {
     inhale: { duration: 4, next: "hold", text: "Breathe In", color: "bg-blue-500" },
@@ -51,6 +52,11 @@ export function BreathingExercise({ onBack }: BreathingExerciseProps) {
     }
   }, [isActive, timeLeft, phase, cycle, totalCycles])
 
+  useEffect(() => {
+    const mood = localStorage.getItem("currentMoodForBreathing")
+    setCurrentMood(mood)
+  }, [])
+
   const handleStart = () => {
     setIsActive(true)
   }
@@ -64,6 +70,39 @@ export function BreathingExercise({ onBack }: BreathingExerciseProps) {
     setPhase("inhale")
     setTimeLeft(4)
     setCycle(0)
+    localStorage.removeItem("currentMoodForBreathing")
+  }
+
+  const handleBreathingComplete = () => {
+    if (currentMood === "sad") {
+      const eggs = JSON.parse(localStorage.getItem("eggs") || "[]")
+      const moods = [
+        { id: "happy", label: "Happy", animal: "🦁" },
+        { id: "excited", label: "Excited", animal: "🐒" },
+        { id: "calm", label: "Calm", animal: "🐢" },
+        { id: "sad", label: "Sad", animal: "🐧" },
+        { id: "anxious", label: "Anxious", animal: "🐰" },
+        { id: "angry", label: "Angry", animal: "🐺" },
+        { id: "tired", label: "Tired", animal: "🐨" },
+        { id: "grateful", label: "Grateful", animal: "🦋" },
+      ]
+      const sadMood = moods.find((m) => m.id === "sad")
+      if (sadMood) {
+        const rarities = ["common", "common", "common", "rare", "rare", "legendary", "mythical", "godly"]
+        const rarity = rarities[Math.floor(Math.random() * rarities.length)]
+        const newEgg = {
+          id: Date.now(),
+          mood: "sad",
+          animal: sadMood.animal,
+          rarity,
+          createdAt: new Date().toISOString(),
+          hatchTime: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        }
+        eggs.push(newEgg)
+        localStorage.setItem("eggs", JSON.stringify(eggs))
+      }
+      localStorage.removeItem("currentMoodForBreathing")
+    }
   }
 
   const currentConfig = phaseConfig[phase]
@@ -71,6 +110,8 @@ export function BreathingExercise({ onBack }: BreathingExerciseProps) {
   const overallProgress = (cycle / totalCycles) * 100
 
   if (cycle >= totalCycles) {
+    handleBreathingComplete()
+
     return (
       <div className="space-y-6">
         <Button variant="ghost" size="sm" onClick={onBack}>
@@ -84,6 +125,11 @@ export function BreathingExercise({ onBack }: BreathingExerciseProps) {
           <p className="text-muted-foreground">
             You've completed your breathing exercise. Your zoo animals are proud of you for taking care of yourself!
           </p>
+          {currentMood === "sad" && (
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm text-blue-800">🎉 You earned a bonus egg for completing breathing while sad!</p>
+            </div>
+          )}
           <div className="flex gap-4 justify-center">
             <Button onClick={handleReset} variant="outline">
               Do Another Round

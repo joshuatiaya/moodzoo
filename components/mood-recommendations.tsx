@@ -94,9 +94,16 @@ export function MoodRecommendations({ mood, onStartBreathing }: MoodRecommendati
                 <h4 className="font-medium text-blue-800">Try Breathing Exercises</h4>
                 <p className="text-sm text-blue-700">
                   Take a few minutes to breathe deeply with your animal friends. It can help calm your mind and reduce
-                  stress.
+                  stress. Complete it to earn a bonus egg!
                 </p>
-                <Button onClick={onStartBreathing} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button
+                  onClick={() => {
+                    localStorage.setItem("currentMoodForBreathing", "sad")
+                    onStartBreathing()
+                  }}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
                   <Wind className="h-4 w-4 mr-2" />
                   Start Breathing Exercise
                 </Button>
