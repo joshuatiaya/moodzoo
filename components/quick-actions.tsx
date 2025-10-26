@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Heart, BarChart3, Trophy } from "lucide-react"
+import { Heart, BarChart3, Trophy, Calendar, Palette } from "lucide-react"
 import Link from "next/link"
 
 export function QuickActions() {
@@ -34,6 +34,20 @@ export function QuickActions() {
           <Button variant="outline" className="w-full h-16 flex-col gap-2 bg-transparent">
             <div className="text-lg">🦁</div>
             <span className="text-sm">My Zoo</span>
+          </Button>
+        </Link>
+
+        <Link href="/calendar">
+          <Button variant="outline" className="w-full h-16 flex-col gap-2 bg-transparent">
+            <Calendar className="h-5 w-5" />
+            <span className="text-sm">Calendar</span>
+          </Button>
+        </Link>
+
+        <Link href="/draw">
+          <Button variant="outline" className="w-full h-16 flex-col gap-2 bg-transparent">
+            <Palette className="h-5 w-5" />
+            <span className="text-sm">Draw</span>
           </Button>
         </Link>
 

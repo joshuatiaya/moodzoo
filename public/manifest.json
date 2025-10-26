@@ -1,0 +1,39 @@
+{
+  "name": "MoodZoo",
+  "short_name": "MoodZoo",
+  "description": "Track your moods as animals in your personal zoo",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/moodzoo-icon.jpg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/moodzoo-icon.jpg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/moodzoo-icon.jpg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["health", "wellness"],
+  "screenshots": [
+    {
+      "src": "/moodzoo-icon.jpg",
+      "sizes": "540x720",
+      "type": "image/svg+xml"
+    }
+  ]
+}
