@@ -6,6 +6,7 @@ import { QuickActions } from "@/components/quick-actions"
 import { EvolutionPreview } from "@/components/evolution-preview"
 import { PremiumSystem } from "@/components/premium-system"
 import { QuestSystem } from "@/components/quest-system"
+import { SleepTracker } from "@/components/sleep-tracker" // Added sleep tracker component
 
 export default function HomePage() {
   return (
@@ -19,8 +20,8 @@ export default function HomePage() {
               Transform your emotions into adorable animals and watch your personal zoo grow
             </p>
           </div>
-
           <MoodLogger />
+          <SleepTracker /> // Added sleep tracker component to main page
           <PremiumSystem />
           <QuestSystem />
           <EvolutionPreview />

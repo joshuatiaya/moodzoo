@@ -19,6 +19,7 @@ const HABITATS = [
     background: "bg-gradient-to-b from-yellow-200 to-orange-200",
     ground: "bg-yellow-600",
     premium: false,
+    previewImage: "/images/savanna-preview.png",
   },
   {
     id: "forest",
@@ -28,6 +29,7 @@ const HABITATS = [
     background: "bg-gradient-to-b from-green-200 to-green-300",
     ground: "bg-green-700",
     premium: false,
+    previewImage: "/images/forest-preview.png",
   },
   {
     id: "arctic",
@@ -37,6 +39,7 @@ const HABITATS = [
     background: "bg-gradient-to-b from-blue-200 to-blue-300",
     ground: "bg-blue-600",
     premium: false,
+    previewImage: "/images/arctic-preview.png",
   },
   {
     id: "burrow",
@@ -46,6 +49,7 @@ const HABITATS = [
     background: "bg-gradient-to-b from-purple-200 to-purple-300",
     ground: "bg-purple-600",
     premium: false,
+    previewImage: "/images/burrow-preview.png",
   },
   {
     id: "mystic-garden",
@@ -55,6 +59,7 @@ const HABITATS = [
     background: "bg-gradient-to-b from-pink-200 via-purple-200 to-indigo-200",
     ground: "bg-gradient-to-r from-pink-600 to-purple-600",
     premium: true,
+    previewImage: "/images/mystic-garden-preview.png",
   },
   {
     id: "crystal-cave",
@@ -64,6 +69,7 @@ const HABITATS = [
     background: "bg-gradient-to-b from-cyan-200 via-blue-200 to-indigo-200",
     ground: "bg-gradient-to-r from-cyan-600 to-blue-600",
     premium: true,
+    previewImage: "/images/crystal-cave-preview.png",
   },
   {
     id: "sky-palace",
@@ -73,6 +79,7 @@ const HABITATS = [
     background: "bg-gradient-to-b from-white via-blue-100 to-purple-100",
     ground: "bg-gradient-to-r from-blue-500 to-purple-500",
     premium: true,
+    previewImage: "/images/sky-palace-preview.png",
   },
 ]
 
@@ -616,6 +623,13 @@ export function ZooHabitat() {
                     )}
                   </div>
                 </button>
+                <div className="p-4 bg-muted rounded-b-lg">
+                  <img
+                    src={habitat.previewImage || "/placeholder.svg"}
+                    alt={`${habitat.name} Preview`}
+                    className="w-full h-auto rounded-lg"
+                  />
+                </div>
               </Card>
             )
           })}
