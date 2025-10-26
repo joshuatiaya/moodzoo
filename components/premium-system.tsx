@@ -27,18 +27,43 @@ export function PremiumSystem({ onPremiumStatusChange }: PremiumSystemProps) {
   const handleUpgradeToPremium = async () => {
     setIsProcessingPayment(true)
 
-    // Simulate payment processing
-    setTimeout(() => {
-      localStorage.setItem("isPremium", "true")
-      localStorage.setItem("premiumPurchaseDate", new Date().toISOString())
-      setIsPremium(true)
-      setIsProcessingPayment(false)
-      setShowUpgradeDialog(false)
+    // Create PayPal checkout
+    const paypalCheckoutUrl = `https://www.paypal.com/checkoutnow?token=${encodeURIComponent(
+      "EC-" + Math.random().toString(36).substring(7),
+    )}`
 
-      if (onPremiumStatusChange) {
-        onPremiumStatusChange(true)
+    // For production, you would create a PayPal order server-side
+    // This opens PayPal checkout in a new window
+    const paypalWindow = window.open(
+      `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=footballtiaya@icloud.com&item_name=MoodZoo+Premium&amount=4.99&currency_code=USD&return=${encodeURIComponent(
+        window.location.origin,
+      )}&cancel_return=${encodeURIComponent(window.location.origin)}`,
+      "paypal",
+      "width=500,height=600",
+    )
+
+    // Check if payment was completed
+    const checkPayment = setInterval(() => {
+      if (paypalWindow?.closed) {
+        clearInterval(checkPayment)
+        // In production, verify payment with server
+        localStorage.setItem("isPremium", "true")
+        localStorage.setItem("premiumPurchaseDate", new Date().toISOString())
+        localStorage.setItem("premiumPaymentMethod", "paypal")
+        setIsPremium(true)
+        setIsProcessingPayment(false)
+        setShowUpgradeDialog(false)
+
+        if (onPremiumStatusChange) {
+          onPremiumStatusChange(true)
+        }
       }
-    }, 2000)
+    }, 1000)
+
+    setTimeout(() => {
+      clearInterval(checkPayment)
+      setIsProcessingPayment(false)
+    }, 300000) // 5 minute timeout
   }
 
   const premiumFeatures = [
@@ -125,7 +150,7 @@ export function PremiumSystem({ onPremiumStatusChange }: PremiumSystemProps) {
               <Button
                 onClick={handleUpgradeToPremium}
                 disabled={isProcessingPayment}
-                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {isProcessingPayment ? (
                   <>
@@ -135,12 +160,12 @@ export function PremiumSystem({ onPremiumStatusChange }: PremiumSystemProps) {
                 ) : (
                   <>
                     <Crown className="h-4 w-4 mr-2" />
-                    Purchase with Apple Pay
+                    Purchase with PayPal
                   </>
                 )}
               </Button>
 
-              <div className="text-center text-xs text-muted-foreground">Secure payment processed by Apple</div>
+              <div className="text-center text-xs text-muted-foreground">Secure payment processed by PayPal</div>
             </div>
           </div>
         </DialogContent>
