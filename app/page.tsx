@@ -6,7 +6,7 @@ import { QuickActions } from "@/components/quick-actions"
 import { EvolutionPreview } from "@/components/evolution-preview"
 import { PremiumSystem } from "@/components/premium-system"
 import { QuestSystem } from "@/components/quest-system"
-import { SleepTracker } from "@/components/sleep-tracker" // Added sleep tracker component
+import { SleepTracker } from "@/components/sleep-tracker"
 
 export default function HomePage() {
   return (
@@ -21,7 +21,7 @@ export default function HomePage() {
             </p>
           </div>
           <MoodLogger />
-          <SleepTracker /> // Added sleep tracker component to main page
+          <SleepTracker />
           <PremiumSystem />
           <QuestSystem />
           <EvolutionPreview />

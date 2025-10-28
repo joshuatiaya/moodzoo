@@ -4,11 +4,11 @@ import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Wind, Gamepad2, Palette, Music, Heart } from "lucide-react"
+import { ArrowLeft, Wind, Gamepad2, Music, Heart } from "lucide-react"
 import Link from "next/link"
 import { BreathingExercise } from "@/components/breathing-exercise"
-import { ColoringActivity } from "@/components/coloring-activity"
 import { MiniGame } from "@/components/mini-game"
+import React from "react"
 
 const ACTIVITIES = [
   {
@@ -19,15 +19,6 @@ const ACTIVITIES = [
     color: "bg-blue-100 text-blue-800",
     duration: "3-5 min",
     mood: "Anxious, Stressed",
-  },
-  {
-    id: "coloring",
-    title: "Animal Coloring",
-    description: "Color peaceful scenes with your zoo animals",
-    icon: Palette,
-    color: "bg-purple-100 text-purple-800",
-    duration: "5-10 min",
-    mood: "Sad, Tired",
   },
   {
     id: "game",
@@ -51,16 +42,16 @@ const ACTIVITIES = [
 
 export function ActivitiesHub() {
   const [selectedActivity, setSelectedActivity] = useState<string | null>(null)
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null)
+  const [currentSound, setCurrentSound] = useState<OscillatorNode | null>(null)
 
   useEffect(() => {
     const triggerBreathing = localStorage.getItem("triggerBreathingExercise")
     if (triggerBreathing === "true") {
       setSelectedActivity("breathing")
-      // Clear the trigger
       localStorage.removeItem("triggerBreathingExercise")
     }
 
-    // Keep the existing event listener for other potential triggers
     const handleStartBreathing = () => {
       setSelectedActivity("breathing")
     }
@@ -73,28 +64,12 @@ export function ActivitiesHub() {
     return <BreathingExercise onBack={() => setSelectedActivity(null)} />
   }
 
-  if (selectedActivity === "coloring") {
-    return <ColoringActivity onBack={() => setSelectedActivity(null)} />
-  }
-
   if (selectedActivity === "game") {
     return <MiniGame onBack={() => setSelectedActivity(null)} />
   }
 
   if (selectedActivity === "sounds") {
-    return (
-      <div className="space-y-6">
-        <Button variant="ghost" size="sm" onClick={() => setSelectedActivity(null)}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Activities
-        </Button>
-        <Card className="p-8 text-center space-y-6">
-          <Music className="h-16 w-16 mx-auto text-primary" />
-          <h2 className="text-2xl font-bold text-foreground">Nature Sounds</h2>
-          <p className="text-muted-foreground">Coming soon! Relaxing sounds from your favorite habitats.</p>
-        </Card>
-      </div>
-    )
+    return <NatureSounds onBack={() => setSelectedActivity(null)} />
   }
 
   return (
@@ -156,6 +131,90 @@ export function ActivitiesHub() {
             cheering you on!
           </p>
         </div>
+      </Card>
+    </div>
+  )
+}
+
+function NatureSounds({ onBack }: { onBack: () => void }) {
+  const [selectedSound, setSelectedSound] = useState<string | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const audioRef = React.useRef<HTMLAudioElement | null>(null)
+
+  const sounds = [
+    { id: "forest", name: "Forest Rain", emoji: "🌧️", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/calming-rain-257596-HkKPiCMnwqaXbELXDd5iRwa7EHqlUX.mp3" },
+    { id: "ocean", name: "Ocean Waves", emoji: "🌊", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/soothing-ocean-waves-372489-6h2PIUsX1yLkVN7Ef5QwDC2XpV3Ic6.mp3" },
+    { id: "birds", name: "Bird Chirping", emoji: "🐦", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/eq11433dwac-birds-chirping-9-lTfnlfMFSH9HKfh7lCEs8afTjwidbG.mp3" },
+    { id: "stream", name: "Flowing Stream", emoji: "💧", url: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/water-stream-river-360596-QuPAmS3eIlIVUH9PXhjLTGZCZNPupI.mp3" },
+  ]
+
+  const playSound = (soundId: string) => {
+    setSelectedSound(soundId)
+
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+    }
+
+    const sound = sounds.find((s) => s.id === soundId)
+    if (sound) {
+      const audio = new Audio(sound.url)
+      audioRef.current = audio
+      audio.loop = true
+      audio.play()
+      setIsPlaying(true)
+    }
+  }
+
+  const stopSound = () => {
+    if (audioRef.current) {
+      audioRef.current.pause()
+      audioRef.current.currentTime = 0
+    }
+    setIsPlaying(false)
+    setSelectedSound(null)
+  }
+
+  return (
+    <div className="space-y-6">
+      <Button variant="ghost" size="sm" onClick={onBack}>
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back to Activities
+      </Button>
+
+      <Card className="p-8 space-y-6">
+        <div className="text-center space-y-2">
+          <Music className="h-16 w-16 mx-auto text-primary" />
+          <h2 className="text-2xl font-bold text-foreground">Nature Sounds</h2>
+          <p className="text-muted-foreground">Choose a relaxing sound to help you unwind</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          {sounds.map((sound) => (
+            <button
+              key={sound.id}
+              onClick={() => playSound(sound.id)}
+              className={`p-6 rounded-lg border-2 transition-all text-center space-y-2 ${
+                selectedSound === sound.id && isPlaying
+                  ? "border-primary bg-primary/10"
+                  : "border-border hover:border-primary"
+              }`}
+            >
+              <div className="text-4xl">{sound.emoji}</div>
+              <p className="font-medium text-foreground">{sound.name}</p>
+            </button>
+          ))}
+        </div>
+
+        {isPlaying && (
+          <Button onClick={stopSound} variant="outline" className="w-full bg-transparent">
+            Stop Sound
+          </Button>
+        )}
+
+        <Button onClick={onBack} className="w-full">
+          Done Relaxing
+        </Button>
       </Card>
     </div>
   )

@@ -604,32 +604,30 @@ export function ZooHabitat() {
                     </div>
                   </div>
 
-                  <div className="p-4 bg-card">
+                  <div className="p-6 bg-card border-t">
                     {habitatAnimals.length === 0 ? (
-                      <div className="text-center text-muted-foreground text-sm py-2">
+                      <div className="text-center text-muted-foreground text-sm py-4">
                         No animals yet - log moods to discover them!
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
-                        {habitatAnimals.slice(0, 4).map((animal, index) => (
-                          <div key={index} className="text-2xl relative inline-block">
+                      <div className="flex flex-wrap items-center gap-4">
+                        {habitatAnimals.slice(0, 6).map((animal, index) => (
+                          <div
+                            key={index}
+                            className="text-4xl relative inline-block hover:scale-110 transition-transform"
+                          >
                             {renderAnimalWithSkin(animal.emoji, animal.skins?.[0])}
                           </div>
                         ))}
-                        {habitatAnimals.length > 4 && (
-                          <div className="text-sm text-muted-foreground">+{habitatAnimals.length - 4} more</div>
+                        {habitatAnimals.length > 6 && (
+                          <div className="text-sm font-medium text-muted-foreground">
+                            +{habitatAnimals.length - 6} more
+                          </div>
                         )}
                       </div>
                     )}
                   </div>
                 </button>
-                <div className="p-4 bg-muted rounded-b-lg">
-                  <img
-                    src={habitat.previewImage || "/placeholder.svg"}
-                    alt={`${habitat.name} Preview`}
-                    className="w-full h-auto rounded-lg"
-                  />
-                </div>
               </Card>
             )
           })}

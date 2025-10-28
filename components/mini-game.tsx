@@ -11,7 +11,7 @@ interface MiniGameProps {
 }
 
 const ANIMALS = ["🦁", "🐢", "🐒", "🐰", "🦋", "🐧"]
-const FOODS = ["🥕", "🍃", "🍌", "🥬", "🌸", "🐟"]
+const FOODS = ["🥩", "🥕", "🍃", "🍌", "🥬", "🌸", "🐟"]
 
 export function MiniGame({ onBack }: MiniGameProps) {
   const [score, setScore] = useState(0)
@@ -19,6 +19,7 @@ export function MiniGame({ onBack }: MiniGameProps) {
   const [currentFood, setCurrentFood] = useState("")
   const [gameState, setGameState] = useState<"playing" | "correct" | "wrong">("playing")
   const [streak, setStreak] = useState(0)
+  const [totalRounds, setTotalRounds] = useState(0)
 
   const animalFoodPairs: Record<string, string> = {
     "🦁": "🥩",
@@ -33,6 +34,7 @@ export function MiniGame({ onBack }: MiniGameProps) {
     const randomAnimal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)]
     setCurrentAnimal(randomAnimal)
     setGameState("playing")
+    setTotalRounds((prev) => prev + 1)
   }
 
   useEffect(() => {
@@ -47,21 +49,49 @@ export function MiniGame({ onBack }: MiniGameProps) {
       setGameState("correct")
       setScore(score + 10)
       setStreak(streak + 1)
+      // Play success sound
+      playSound("success")
       setTimeout(() => {
         generateNewRound()
       }, 1500)
     } else {
       setGameState("wrong")
       setStreak(0)
+      // Play error sound
+      playSound("error")
       setTimeout(() => {
         setGameState("playing")
       }, 1500)
     }
   }
 
+  const playSound = (type: "success" | "error") => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+    const oscillator = audioContext.createOscillator()
+    const gainNode = audioContext.createGain()
+
+    oscillator.connect(gainNode)
+    gainNode.connect(audioContext.destination)
+
+    if (type === "success") {
+      oscillator.frequency.value = 800
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2)
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.2)
+    } else {
+      oscillator.frequency.value = 300
+      gainNode.gain.setValueAtTime(0.2, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1)
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 0.1)
+    }
+  }
+
   const handleReset = () => {
     setScore(0)
     setStreak(0)
+    setTotalRounds(0)
     generateNewRound()
   }
 
@@ -78,15 +108,14 @@ export function MiniGame({ onBack }: MiniGameProps) {
           <p className="text-muted-foreground">Help feed your zoo friends their favorite foods!</p>
         </div>
 
-        {/* Score */}
         <div className="flex justify-center gap-4">
           <Badge variant="secondary">Score: {score}</Badge>
           <Badge variant="outline">Streak: {streak}</Badge>
+          <Badge variant="outline">Round: {totalRounds}</Badge>
         </div>
 
-        {/* Current Animal */}
         <div className="text-center space-y-4">
-          <div className="text-8xl">{currentAnimal}</div>
+          <div className="text-8xl animate-bounce">{currentAnimal}</div>
           <p className="text-lg font-medium text-foreground">
             {gameState === "playing" && "What does this animal want to eat?"}
             {gameState === "correct" && "Yummy! Great job! 🎉"}
@@ -94,14 +123,13 @@ export function MiniGame({ onBack }: MiniGameProps) {
           </p>
         </div>
 
-        {/* Food Options */}
         {gameState === "playing" && (
           <div className="grid grid-cols-3 gap-4">
             {FOODS.map((food) => (
               <button
                 key={food}
                 onClick={() => handleFoodSelect(food)}
-                className="p-6 text-4xl bg-muted hover:bg-muted/80 rounded-lg transition-colors"
+                className="p-6 text-4xl bg-muted hover:bg-primary/20 rounded-lg transition-all transform hover:scale-110"
               >
                 {food}
               </button>
@@ -109,7 +137,6 @@ export function MiniGame({ onBack }: MiniGameProps) {
           </div>
         )}
 
-        {/* Game Over / High Score */}
         {score >= 100 && (
           <Card className="p-4 bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200">
             <div className="text-center space-y-2">

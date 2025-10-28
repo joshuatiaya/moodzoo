@@ -27,35 +27,33 @@ export function PremiumSystem({ onPremiumStatusChange }: PremiumSystemProps) {
   const handleUpgradeToPremium = async () => {
     setIsProcessingPayment(true)
 
-    // Create PayPal checkout
-    const paypalCheckoutUrl = `https://www.paypal.com/checkoutnow?token=${encodeURIComponent(
-      "EC-" + Math.random().toString(36).substring(7),
-    )}`
-
-    // For production, you would create a PayPal order server-side
-    // This opens PayPal checkout in a new window
     const paypalWindow = window.open(
       `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=footballtiaya@icloud.com&item_name=MoodZoo+Premium&amount=4.99&currency_code=USD&return=${encodeURIComponent(
-        window.location.origin,
-      )}&cancel_return=${encodeURIComponent(window.location.origin)}`,
+        window.location.origin + "/premium-success",
+      )}&cancel_return=${encodeURIComponent(window.location.origin + "/premium-cancel")}`,
       "paypal",
       "width=500,height=600",
     )
 
-    // Check if payment was completed
     const checkPayment = setInterval(() => {
       if (paypalWindow?.closed) {
         clearInterval(checkPayment)
-        // In production, verify payment with server
-        localStorage.setItem("isPremium", "true")
-        localStorage.setItem("premiumPurchaseDate", new Date().toISOString())
-        localStorage.setItem("premiumPaymentMethod", "paypal")
-        setIsPremium(true)
-        setIsProcessingPayment(false)
-        setShowUpgradeDialog(false)
+        const urlParams = new URLSearchParams(window.location.search)
+        const paymentSuccess = urlParams.get("payment") === "success"
 
-        if (onPremiumStatusChange) {
-          onPremiumStatusChange(true)
+        if (paymentSuccess) {
+          localStorage.setItem("isPremium", "true")
+          localStorage.setItem("premiumPurchaseDate", new Date().toISOString())
+          localStorage.setItem("premiumPaymentMethod", "paypal")
+          setIsPremium(true)
+          setIsProcessingPayment(false)
+          setShowUpgradeDialog(false)
+
+          if (onPremiumStatusChange) {
+            onPremiumStatusChange(true)
+          }
+        } else {
+          setIsProcessingPayment(false)
         }
       }
     }, 1000)
