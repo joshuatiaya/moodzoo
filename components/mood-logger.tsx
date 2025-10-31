@@ -78,17 +78,6 @@ export function MoodLogger() {
       existingEggs.push(egg)
       localStorage.setItem("eggs", JSON.stringify(existingEggs))
 
-      const moodEntry = {
-        id: eggId,
-        mood: selectedMood,
-        explanation: explanation,
-        timestamp: new Date().toISOString(),
-        date: new Date().toDateString(),
-      }
-      const existingEntries = JSON.parse(localStorage.getItem("moodEntries") || "[]")
-      existingEntries.push(moodEntry)
-      localStorage.setItem("moodEntries", JSON.stringify(existingEntries))
-
       setTodayLogged(true)
       setDailyCount((prev) => prev + 1)
       setShowRecommendations(true)

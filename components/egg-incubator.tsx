@@ -47,6 +47,23 @@ export function EggIncubator() {
       const hatched = savedEggs.filter((egg: Egg) => now >= egg.createdAt + egg.hatchTime)
 
       if (hatched.length > 0) {
+        const existingEntries = JSON.parse(localStorage.getItem("moodEntries") || "[]")
+        hatched.forEach((egg: Egg) => {
+          // Check if this egg has already been converted to a mood entry
+          const alreadyConverted = existingEntries.some((entry: any) => entry.id === egg.id)
+          if (!alreadyConverted) {
+            const moodEntry = {
+              id: egg.id,
+              mood: egg.mood,
+              explanation: egg.explanation,
+              timestamp: new Date().toISOString(),
+              date: new Date().toDateString(),
+            }
+            existingEntries.push(moodEntry)
+          }
+        })
+        localStorage.setItem("moodEntries", JSON.stringify(existingEntries))
+
         setHatchedAnimals(hatched)
         localStorage.setItem("eggs", JSON.stringify(stillIncubating))
         setEggs(stillIncubating)
